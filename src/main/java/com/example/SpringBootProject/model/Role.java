@@ -4,6 +4,7 @@ package com.example.SpringBootProject.model;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.Objects;
 
 @Data @NoArgsConstructor @AllArgsConstructor @ToString
 @Entity
@@ -19,7 +20,5 @@ public class Role {
     public Role(String name){
         this.name = name;
     }
-
-
 
 }

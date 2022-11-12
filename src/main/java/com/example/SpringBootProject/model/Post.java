@@ -16,7 +16,14 @@ public class Post {
     private Long id;
     private String title;
     private String body;
-    @ManyToOne
-    @JoinColumn(name = "user_id", insertable = false, updatable = false)
+    @ManyToOne(cascade = CascadeType.MERGE)
+    @JoinColumn(name = "user_id")
     private User user;
+
+
+    public Post(String title, String body, User user) {
+        this.title = title;
+        this.body = body;
+        this.user = user;
+    }
 }
