@@ -3,6 +3,7 @@ package com.example.SpringBootProject.controller;
 import com.example.SpringBootProject.model.Post;
 import com.example.SpringBootProject.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,6 +19,7 @@ public class PostController {
 
 
     @GetMapping(path = "/posts")
+    @PreAuthorize("hasRole('Admin')")
     public List<Post> getPosts(){
         return postService.getPosts();
     }

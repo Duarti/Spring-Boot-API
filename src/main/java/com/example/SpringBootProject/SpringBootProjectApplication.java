@@ -6,20 +6,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = { UserDetailsServiceAutoConfiguration.class })
+//@SpringBootApplication
 public class SpringBootProjectApplication {
+
 
 	public static void main(String[] args) {
 		SpringApplication.run(SpringBootProjectApplication.class, args);
 	}
-
-	UserRepository userRepository;
-    @Autowired
-	CommandLineRunner commandLine(UserRepository userRepository){
-		return args -> {
-			userRepository.save(new User(null,"duart","duartn","helloworld",null));
-			};
-	};
 
 }

@@ -9,6 +9,7 @@ import lombok.ToString;
 import javax.persistence.*;
 
 @Entity
+@Table(name = "posts")
 @Data @NoArgsConstructor @AllArgsConstructor
 public class Post {
     @Id @GeneratedValue

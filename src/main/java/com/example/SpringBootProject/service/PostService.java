@@ -5,6 +5,7 @@ import com.example.SpringBootProject.model.User;
 import com.example.SpringBootProject.repository.PostRepository;
 import com.example.SpringBootProject.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class PostService {
         this.postRepository = postRepository;
         this.userRepository = userRepository;
     }
+
 
     public List<Post> getPosts(){
         return postRepository.findAll();
