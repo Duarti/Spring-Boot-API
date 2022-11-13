@@ -4,6 +4,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
+import org.springframework.security.config.annotation.method.configuration.GlobalMethodSecurityConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -15,7 +17,11 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
-public class SecurityConfiguration {
+@EnableGlobalMethodSecurity(
+        prePostEnabled = true,
+        securedEnabled = true,
+        jsr250Enabled = true)
+public class SecurityConfiguration extends GlobalMethodSecurityConfiguration {
 
     private UserDetailsService userDetailsService;
 //    @Bean
@@ -69,9 +75,18 @@ public class SecurityConfiguration {
 //        return http.build();
 
         return http
-                .csrf(csrf -> csrf.ignoringAntMatchers("/register"))
+                .csrf().disable()
                 .authorizeRequests(auth -> auth
-                        .antMatchers("/register").permitAll()
+                        .antMatchers("/register")
+                        .permitAll()
+                        .antMatchers("/login")
+                        .permitAll()
+                        .antMatchers("/customError")
+                        .permitAll()
+                        .antMatchers("/access-denied")
+                        .permitAll()
+                        .antMatchers("/secured")
+                        .hasRole("ROLE_ADMIN")
                         .anyRequest().authenticated())
                 .userDetailsService(userDetailsService)
                 .headers(headers -> headers.frameOptions().sameOrigin())

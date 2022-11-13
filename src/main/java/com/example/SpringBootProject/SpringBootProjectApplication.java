@@ -12,6 +12,8 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 @SpringBootApplication(exclude = { UserDetailsServiceAutoConfiguration.class })
 //@SpringBootApplication
@@ -24,6 +26,8 @@ public class SpringBootProjectApplication implements CommandLineRunner{
 	@Autowired
 	private RoleRepository roleRepository;
 
+	private PasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+
 
 	public static void main(String[] args) {
 		SpringApplication.run(SpringBootProjectApplication.class, args);
@@ -32,15 +36,15 @@ public class SpringBootProjectApplication implements CommandLineRunner{
 	@Override
 	public void run(String... args) throws Exception {
 
-		Role user = new Role("User");
-		Role admin = new Role("Admin");
+		Role user = new Role("ROLE_USER");
+		Role admin = new Role("ROLE_ADMIN");
 
 		user = roleRepository.save(user);
 		admin = roleRepository.save(admin);
 
-		User user1 = new User("Duart Nishefci", "duartnishefci", "kompjuteri13");
-		User user2 = new User("Leart Nishefci", "leartnishefci", "kompjuteri13");
-		User user3 = new User("Elton Nishefci", "eltonnishefci", "kompjuteri13");
+		User user1 = new User("Duart Nishefci", "duartnishefci", passwordEncoder.encode("kompjuteri13"));
+		User user2 = new User("Leart Nishefci", "leartnishefci", passwordEncoder.encode("kompjuteri13"));
+		User user3 = new User("Elton Nishefci", "eltonnishefci", passwordEncoder.encode("kompjuteri13"));
 
 		user1.addRole(admin);
 		user2.addRole(user);

@@ -4,8 +4,10 @@ import com.example.SpringBootProject.model.Post;
 import com.example.SpringBootProject.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -19,9 +21,9 @@ public class PostController {
 
 
     @GetMapping(path = "/posts")
-    @PreAuthorize("hasRole('Admin')")
-    public List<Post> getPosts(){
-        return postService.getPosts();
+    @PreAuthorize("hasRole('ROLE_USER')")
+    public List<Post> getPosts(Principal principal){
+        return postService.getPosts(principal);
     }
 
     @GetMapping(path = "/post/{id}")
