@@ -21,7 +21,7 @@ public class PostController {
 
 
     @GetMapping(path = "/posts")
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_USER')")
     public List<Post> getPosts(Principal principal){
         return postService.getPosts(principal);
     }

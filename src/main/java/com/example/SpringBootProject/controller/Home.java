@@ -9,8 +9,7 @@ public class Home {
 
     @GetMapping
     public String home(Authentication authentication){
-        System.out.println(authentication.getAuthorities());
-        return "Welcome Home!";
+        return "Welcome Home21!";
     }
 
 }
