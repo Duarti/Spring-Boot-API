@@ -1,5 +1,6 @@
 package com.example.SpringBootProject.model;
 
+import com.example.SpringBootProject.repository.UserRepository;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 
 import javax.persistence.*;
+import java.security.Principal;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -41,5 +43,19 @@ public class User {
         this.name = name;
         this.username = username;
         this.password = password;
+    }
+
+    public boolean isAdmin(){
+        boolean isAdmin = false;
+        for(Role role: getRoles()){
+            if(role.getName().equals("ROLE_ADMIN")) isAdmin = true;
+        }
+        return isAdmin;
+    }
+
+    public static User getUser(Principal principal, UserRepository userRepository){
+        String username = principal.getName();
+        User user = userRepository.getUserByUsername(username);
+        return user;
     }
 }

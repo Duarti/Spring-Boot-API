@@ -7,35 +7,36 @@ import com.example.SpringBootProject.request.UserRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @RestController
 public class RegisterController {
 
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
+    private SecurityService securityService;
     @Autowired
-    public RegisterController(UserRepository userRepository){
+    public RegisterController(UserRepository userRepository, SecurityService securityService){
         this.userRepository = userRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
+        this.securityService = securityService;
     }
 
-    @PostMapping(path = "/register")
+    @PostMapping(path = "/api/register")
     public User register(@RequestBody UserRequest userRequest){
-        User user = userRepository.getUserByUsername(userRequest.getUsername());
-        if( user != null) throw new Error("User with such username already exists!");
-        System.out.println(userRequest);
-        user = new User();
-        user.setUsername(userRequest.getUsername());
-        user.addRole(new Role("User"));
-        user.setName(userRequest.getName());
-        user.setPassword(passwordEncoder.encode(userRequest.getPassword()));
-        System.out.println(user);
-        userRepository.save(user);
-        return user;
+        return securityService.register(userRequest);
+    }
+
+
+    @PostMapping(path="/api/token/refresh")
+    public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        securityService.refreshToken(request, response);
     }
 
 

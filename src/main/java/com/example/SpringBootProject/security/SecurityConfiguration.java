@@ -15,7 +15,9 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.NoOpPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
+import static org.springframework.http.HttpMethod.*;
 import static org.springframework.security.config.http.SessionCreationPolicy.STATELESS;
 
 @Configuration
@@ -33,7 +35,7 @@ public class SecurityConfiguration extends GlobalMethodSecurityConfiguration {
 //    }
 
     @Autowired
-    public SecurityConfiguration(UserDetailsService userDetailsService){
+    public SecurityConfiguration(UserDetailsService userDetailsService) {
         this.userDetailsService = userDetailsService;
     }
 
@@ -50,60 +52,31 @@ public class SecurityConfiguration extends GlobalMethodSecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
 
-//        http.authorizeRequests().antMatchers("/login").permitAll()
-//                .antMatchers("/users/**", "/settings/**").hasAuthority("Admin")
-//                .hasAnyAuthority("Admin", "Editor", "Salesperson")
-//                .hasAnyAuthority("Admin", "Editor", "Salesperson", "Shipper")
-//                .anyRequest().authenticated()
-//                .and().formLogin()
-//                .loginPage("/login")
-//                .usernameParameter("email")
-//                .permitAll()
-//                .and()
-//                .rememberMe().key("AbcdEfghIjklmNopQrsTuvXyz_0123456789")
-//                .and()
-//                .logout().permitAll();
-//
-//        http.headers().frameOptions().sameOrigin();
-//
-//        return http.build();
+        CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
+        customAuthenticationFilter.setFilterProcessesUrl("/api/login");
 
-//        http.authorizeRequests()
-//                .anyRequest().authenticated()
-//                .and()
-//                .formLogin().permitAll()
-//                .and()
-//                .logout().permitAll();
-//
-//        return http.build();
 
-        return http
-                .csrf().disable()
-                .authorizeRequests(auth -> auth
-//                        .antMatchers("/register")
-//                        .permitAll()
-//                        .antMatchers("/login")
-//                        .permitAll()
-//                        .antMatchers("/customError")
-//                        .permitAll()
-//                        .antMatchers("/access-denied")
-//                        .permitAll()
-//                        .antMatchers("/secured")
-//                        .hasRole("ROLE_ADMIN")
-                        .anyRequest().permitAll())
-                .userDetailsService(userDetailsService)
+        http.csrf().disable()
+                .sessionManagement().sessionCreationPolicy(STATELESS);
+//                http.authorizeRequests(auth -> auth
+//                        .antMatchers("/api/login/**").permitAll()
+//                        .anyRequest().authenticated());
+        http.authorizeRequests().antMatchers("/api/login/**", "/api/token/refresh/**", "/api/register/**").permitAll();
+        http.authorizeRequests().antMatchers(GET, "/api/users").hasAnyAuthority("ROLE_USER");
+        http.authorizeRequests().antMatchers(GET, "/api/posts", "/api/user/*/posts/**", "/api/users/**", "/api/user/**", "/api/post/*/user/**").hasAnyAuthority("ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(GET, "/api/post/**", "/api/myposts/**", "/api/me/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER");
+        http.authorizeRequests().antMatchers(POST, "/api/posts/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER");
+        http.authorizeRequests().antMatchers(DELETE, "api/post/*/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER");
+        http.authorizeRequests().antMatchers(PUT, "api/post/*/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER");
+        http.authorizeRequests().anyRequest().authenticated();
+        http.userDetailsService(userDetailsService)
                 .headers(headers -> headers.frameOptions().sameOrigin())
                 .httpBasic(Customizer.withDefaults())
-                .addFilter(new CustomAuthenticationFilter(authenticationManager()))
-                .build();
-//        http.csrf().disable();
-//        http.sessionManagement().sessionCreationPolicy(STATELESS);
-//        http.authorizeRequests().anyRequest().permitAll();
-//        http.userDetailsService(userDetailsService);
-//        http.addFilter(new CustomAuthenticationFilter(authenticationManager()));
+                .addFilter(customAuthenticationFilter)
+                .addFilterBefore(new CustomAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
+        return http.build();
 
-//        return http.build();
     }
 
     @Override
@@ -111,7 +84,6 @@ public class SecurityConfiguration extends GlobalMethodSecurityConfiguration {
     protected AuthenticationManager authenticationManager() throws Exception {
         return super.authenticationManager();
     }
-
 
 
     @Bean

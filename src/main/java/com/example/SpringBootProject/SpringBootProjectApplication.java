@@ -55,7 +55,6 @@ public class SpringBootProjectApplication implements CommandLineRunner{
 		user3 = userRepository.save(user3);
 
 		Post post1 = new Post("PostTitle1", "PostBody", user1);
-		System.out.println(post1);
 
 		postRepository.save(post1);
 		postRepository.save(new Post("PostTitle2", "PostBody", user2));

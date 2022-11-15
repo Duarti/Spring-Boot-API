@@ -1,14 +1,32 @@
 package com.example.SpringBootProject.service;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
+import com.auth0.jwt.algorithms.Algorithm;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import com.example.SpringBootProject.model.Post;
+import com.example.SpringBootProject.model.Role;
 import com.example.SpringBootProject.model.User;
 import com.example.SpringBootProject.repository.PostRepository;
 import com.example.SpringBootProject.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.Optional;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.security.Principal;
+import java.util.*;
+import java.util.stream.Collectors;
+
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static org.springframework.util.MimeTypeUtils.APPLICATION_JSON_VALUE;
 
 @Service
 public class UserService {
@@ -39,6 +57,11 @@ public class UserService {
         else {
             throw new Error("Post with ID " + postId + " doesn't exist!");
         }
+    }
+
+    public User getMe(Principal principal){
+        User user = User.getUser(principal, userRepository);
+        return user;
     }
 
 

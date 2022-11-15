@@ -8,5 +8,4 @@ import lombok.NoArgsConstructor;
 public class PostRequest {
     private String title;
     private String body;
-    private Long userId;
 }
