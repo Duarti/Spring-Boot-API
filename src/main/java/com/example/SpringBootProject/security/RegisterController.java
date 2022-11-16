@@ -1,6 +1,5 @@
 package com.example.SpringBootProject.security;
 
-import com.example.SpringBootProject.model.Role;
 import com.example.SpringBootProject.model.User;
 import com.example.SpringBootProject.repository.UserRepository;
 import com.example.SpringBootProject.request.UserRequest;
@@ -21,20 +20,21 @@ public class RegisterController {
     private UserRepository userRepository;
     private PasswordEncoder passwordEncoder;
     private SecurityService securityService;
+
     @Autowired
-    public RegisterController(UserRepository userRepository, SecurityService securityService){
+    public RegisterController(UserRepository userRepository, SecurityService securityService) {
         this.userRepository = userRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
         this.securityService = securityService;
     }
 
     @PostMapping(path = "/api/register")
-    public User register(@RequestBody UserRequest userRequest){
+    public User register(@RequestBody UserRequest userRequest) {
         return securityService.register(userRequest);
     }
 
 
-    @PostMapping(path="/api/token/refresh")
+    @PostMapping(path = "/api/token/refresh")
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         securityService.refreshToken(request, response);
     }

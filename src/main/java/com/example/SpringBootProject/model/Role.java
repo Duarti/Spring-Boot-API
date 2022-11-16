@@ -2,22 +2,29 @@ package com.example.SpringBootProject.model;
 
 
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
-import java.util.Objects;
 
-@Data @NoArgsConstructor @AllArgsConstructor @ToString
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+@ToString
 @Entity
 @Table(name = "roles")
 public class Role {
     @Id
-    @GeneratedValue
+    @GeneratedValue(generator = "role_id_generator")
+    @GenericGenerator(
+            name = "role_id_generator",
+            strategy = "org.hibernate.id.enhanced.SequenceStyleGenerator"
+    )
     private Long id;
 
-    @Column
+    @Column(length = 15)
     private String name;
 
-    public Role(String name){
+    public Role(String name) {
         this.name = name;
     }
 

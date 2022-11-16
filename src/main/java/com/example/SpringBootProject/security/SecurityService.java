@@ -14,10 +14,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -25,7 +21,6 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -38,15 +33,17 @@ public class SecurityService {
     private UserRepository userRepository;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
+
     @Autowired
-    public SecurityService(UserRepository userRepository, RoleRepository roleRepository){
+    public SecurityService(UserRepository userRepository, RoleRepository roleRepository) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = new BCryptPasswordEncoder();
     }
-    public User register(UserRequest userRequest){
+
+    public User register(UserRequest userRequest) {
         User user = userRepository.getUserByUsername(userRequest.getUsername());
-        if( user != null) throw new Error("User with such username already exists!");
+        if (user != null) throw new Error("User with such username already exists!");
         Role userRole = roleRepository.getRoleByName("ROLE_USER");
         user = new User();
         user.setUsername(userRequest.getUsername());
@@ -59,7 +56,7 @@ public class SecurityService {
 
     public void refreshToken(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String authorizationHeader = request.getHeader(AUTHORIZATION);
-        if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")){
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             try {
                 String refresh_token = authorizationHeader.substring("Bearer ".length());
                 Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
@@ -77,7 +74,7 @@ public class SecurityService {
                 tokens.put("refresh_token", refresh_token);
                 response.setContentType(APPLICATION_JSON_VALUE);
                 new ObjectMapper().writeValue(response.getOutputStream(), tokens);
-            } catch (Exception exception){
+            } catch (Exception exception) {
                 response.setHeader("error", exception.getMessage());
                 response.setStatus(FORBIDDEN.value());
                 Map<String, String> error = new HashMap<>();
@@ -86,8 +83,7 @@ public class SecurityService {
                 new ObjectMapper().writeValue(response.getOutputStream(), error);
 
             }
-        }
-        else {
+        } else {
             throw new RuntimeException("Refresh token is missing!");
         }
     }

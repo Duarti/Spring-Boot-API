@@ -1,7 +1,6 @@
 package com.example.SpringBootProject.security;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 
 import com.example.SpringBootProject.model.Role;
@@ -21,13 +20,10 @@ public class MyUserDetails implements UserDetails {
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         ArrayList<SimpleGrantedAuthority> authorities = new ArrayList<>();
-//        user.getRoles().forEach(role -> authorities.add(new SimpleGrantedAuthority((role.getName()))));
-        for(Role role : user.getRoles()){
+        for (Role role : user.getRoles()) {
             authorities.add(new SimpleGrantedAuthority(role.getName()));
         }
         return authorities;
-//      SimpleGrantedAuthority authority = new SimpleGrantedAuthority(user.getRole());
-//      return Arrays.asList(authority);
     }
 
     @Override

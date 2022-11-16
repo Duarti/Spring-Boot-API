@@ -1,5 +1,7 @@
 package com.example.SpringBootProject.security;
 
+import com.example.SpringBootProject.security.filters.CustomAuthenticationFilter;
+import com.example.SpringBootProject.security.filters.CustomAuthorizationFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,8 +14,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.NoOpPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
@@ -29,10 +29,6 @@ import static org.springframework.security.config.http.SessionCreationPolicy.STA
 public class SecurityConfiguration extends GlobalMethodSecurityConfiguration {
 
     private UserDetailsService userDetailsService;
-//    @Bean
-//    public UserDetailsService userDetailsService() {
-//        return new UserDetailsServiceImpl();
-//    }
 
     @Autowired
     public SecurityConfiguration(UserDetailsService userDetailsService) {
@@ -43,11 +39,6 @@ public class SecurityConfiguration extends GlobalMethodSecurityConfiguration {
     public BCryptPasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-//
-//    @Bean
-//    PasswordEncoder passwordEncoder(){
-//        return NoOpPasswordEncoder.getInstance();
-//    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -55,19 +46,17 @@ public class SecurityConfiguration extends GlobalMethodSecurityConfiguration {
         CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManager());
         customAuthenticationFilter.setFilterProcessesUrl("/api/login");
 
-
         http.csrf().disable()
                 .sessionManagement().sessionCreationPolicy(STATELESS);
-//                http.authorizeRequests(auth -> auth
-//                        .antMatchers("/api/login/**").permitAll()
-//                        .anyRequest().authenticated());
         http.authorizeRequests().antMatchers("/api/login/**", "/api/token/refresh/**", "/api/register/**").permitAll();
         http.authorizeRequests().antMatchers(GET, "/api/users").hasAnyAuthority("ROLE_USER");
         http.authorizeRequests().antMatchers(GET, "/api/posts", "/api/user/*/posts/**", "/api/users/**", "/api/user/**", "/api/post/*/user/**").hasAnyAuthority("ROLE_ADMIN");
         http.authorizeRequests().antMatchers(GET, "/api/post/**", "/api/myposts/**", "/api/me/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER");
         http.authorizeRequests().antMatchers(POST, "/api/posts/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER");
-        http.authorizeRequests().antMatchers(DELETE, "api/post/*/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER");
-        http.authorizeRequests().antMatchers(PUT, "api/post/*/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER");
+        http.authorizeRequests().antMatchers(DELETE, "/api/post/*/**", "api/me/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER");
+        http.authorizeRequests().antMatchers(DELETE, "/api/user/*/**").hasAuthority("ROLE_ADMIN");
+        http.authorizeRequests().antMatchers(PUT, "/api/post/*/**", "/api/me/**").hasAnyAuthority("ROLE_ADMIN", "ROLE_USER");
+        http.authorizeRequests().antMatchers(PUT, "/api/user/*/**", "/api/user/*/makeadmin/**").hasAuthority("ROLE_ADMIN");
         http.authorizeRequests().anyRequest().authenticated();
         http.userDetailsService(userDetailsService)
                 .headers(headers -> headers.frameOptions().sameOrigin())
@@ -84,7 +73,6 @@ public class SecurityConfiguration extends GlobalMethodSecurityConfiguration {
     protected AuthenticationManager authenticationManager() throws Exception {
         return super.authenticationManager();
     }
-
 
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {

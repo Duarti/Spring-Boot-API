@@ -1,8 +1,8 @@
-package com.example.SpringBootProject.security;
+package com.example.SpringBootProject.security.filters;
 
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
-import com.example.SpringBootProject.model.User;
+import com.example.SpringBootProject.security.MyUserDetails;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -11,12 +11,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -54,9 +52,6 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
                 .withExpiresAt(new Date(System.currentTimeMillis() + 24 * 60 * 60 * 1000))
                 .withIssuer(request.getRequestURL().toString())
                 .sign(algorithm);
-
-//        response.setHeader("access_token", access_token);
-//        response.setHeader("refresh_token", refresh_token);
 
         Map<String, String> tokens = new HashMap<>();
         tokens.put("access_token", access_token);

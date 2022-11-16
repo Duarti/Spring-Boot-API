@@ -5,7 +5,6 @@ import com.example.SpringBootProject.request.PostRequest;
 import com.example.SpringBootProject.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
@@ -15,49 +14,58 @@ import java.util.List;
 public class PostController {
 
     private PostService postService;
+
     @Autowired
-    PostController(PostService postService){
+    PostController(PostService postService) {
         this.postService = postService;
     }
 
-
+    //returns all posts.
     @GetMapping(path = "/api/posts")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<Post> getPosts(Principal principal){
-        return postService.getPosts(principal);
+    public List<Post> getPosts() {
+        return postService.getPosts();
     }
 
+    //returns current user posts.
     @GetMapping(path = "/api/myposts")
     @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_ADMIN')")
-    public List<Post> getMyPosts(Principal principal) { return postService.getMyPosts(principal);}
-
-    @GetMapping(path = "/api/post/{id}")
-    @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_ADMIN')")
-    public Post getPost(@PathVariable Long id, Principal principal){
-        return postService.getPost(principal, id);
+    public List<Post> getMyPosts(Principal principal) {
+        return postService.getMyPosts(principal);
     }
 
+    //returns post with id postId.
+    @GetMapping(path = "/api/post/{postId}")
+    @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_ADMIN')")
+    public Post getPost(@PathVariable Long postId, Principal principal) {
+        return postService.getPost(principal, postId);
+    }
+
+    //returns a specific user posts.
     @GetMapping(path = "/api/user/{userId}/posts")
     @PreAuthorize("hasRole('ROLE_ADMIN')")
-    public List<Post> getUserPosts(@PathVariable Long userId){
+    public List<Post> getUserPosts(@PathVariable Long userId) {
         return postService.getUserPosts(userId);
     }
 
-    @PostMapping(path="/api/posts")
+    //creates a new post.
+    @PostMapping(path = "/api/posts")
     @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_ADMIN')")
     public Post createPost(@RequestBody PostRequest postRequest, Principal principal) {
         return postService.createPost(postRequest, principal);
     }
 
-    @DeleteMapping(path="/api/post/{postId}")
+    //deletes post with id postId.
+    @DeleteMapping(path = "/api/post/{postId}")
     @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_ADMIN')")
     public Post deletePost(@PathVariable Long postId, Principal principal) {
         return postService.deletePost(postId, principal);
     }
 
-    @PutMapping(path="api/post/{postId}")
+    //updates post with id postId.
+    @PutMapping(path = "api/post/{postId}")
     @PreAuthorize("hasRole('ROLE_USER') OR hasRole('ROLE_ADMIN')")
-    public Post updatePost(@PathVariable Long postId, @RequestBody PostRequest postRequest, Principal principal){
+    public Post updatePost(@PathVariable Long postId, @RequestBody PostRequest postRequest, Principal principal) {
         return postService.updatePost(postId, postRequest, principal);
     }
 
